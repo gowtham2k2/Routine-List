@@ -1,0 +1,36 @@
+<%- include("partials/header.ejs") %>
+    <div class="container profile">
+        <h2>Welcome <%= userName %>
+        </h2>
+        <div class="list-container">
+            <% locals.data.forEach((item)=>{ %>
+                <div class="list-item">
+                    <form action="/delete" method="post">
+                        <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
+                    </form>
+
+                    <p id="title<%=item.id%>" class="m-0">
+                        <%= item.todo_title %>
+                    </p>
+
+                    <form class="edit" action="/edit" method="post">
+                        <input type="hidden" name="updatedItemId" value="<%= item.id %>">
+                        <input id="input<%=item.id%>" type="text" name="updatedItemTitle" value="<%= item.todo_title %>"
+                            autocomplete="off" autofocus="true" hidden="true" />
+                        <button id="done<%=item.id%>" class="edit" type="submit" hidden>change</button>
+                    </form>
+                    <button id="edit<%=item.id%>" class="edit" onclick="handler('<%=item.id%>')"><img class="icon"
+                            src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+                </div>
+                <% }); %>
+        </div>
+    </div>
+    <script>
+        function handler(id) {
+            document.getElementById("title" + id).setAttribute("hidden", true)
+            document.getElementById("edit" + id).setAttribute("hidden", true)
+            document.getElementById("done" + id).removeAttribute("hidden")
+            document.getElementById("input" + id).removeAttribute("hidden")
+        }
+    </script>
+    <%- include("partials/footer.ejs") %>
