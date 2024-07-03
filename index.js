@@ -51,6 +51,23 @@ app.get("/profile", async (req, res) => {
   }
 });
 
+app.post("/edit", async (req, res) => {
+  const itemId = parseInt(req.body.updatedItemId);
+  const itemTitle = req.body.updatedItemTitle;
+  console.log(
+    `${itemId} is ${typeof itemId} and ${itemTitle} is ${typeof itemTitle}`
+  );
+  try {
+    await db.query("UPDATE todo_list SET todo_title = $1 WHERE id = $2;", [
+      itemTitle,
+      itemId,
+    ]);
+    res.redirect("/profile");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 app.listen(port, () => {
   console.log("App is running on port: " + port);
 });
