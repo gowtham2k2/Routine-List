@@ -5,7 +5,7 @@
                 <%= user.lastName %>
         </h2>
         <div class="list-container">
-            <h4>
+            <h4 class="mb-4">
                 <%= user.userName %>'s today schedule
             </h4>
             <% locals.data.forEach((item)=>{ %>
@@ -29,14 +29,17 @@
                 </div>
                 <% }); %>
                     <form id="addnew" action="/add" method="post" hidden>
-                        <input type="text" name="newItem" autofocus="true" autocomplete="off">
+                        <input type="text" name="newItem" autofocus="on" autocomplete="off">
                         <input type="hidden" name="userId" value="<%= user.userId %>">
                         <p>at</p>
                         <input type="time" name="userTime">
                         <button type="submit">add</button>
                     </form>
-                    <div id="addnew-btn" class="btn circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')">+</div>
-                    <div id="cancelAdd-btn" class="btn circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')" hidden>✖</div>
+                    <div id="addnew-btn" class="btn rounded-circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')">+
+                    </div>
+                    <div id="cancelAdd-btn" class="btn rounded-circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')"
+                        hidden>✖</div>
+
         </div>
     </div>
     <script>
@@ -48,9 +51,6 @@
         }
 
         function swapper(swapFrom, swapTo) {
-            // document.getElementById(swapFrom).setAttribute("hidden", true);
-            // document.getElementById(swapTo).removeAttribute("hidden");
-            // document.getElementById("addnew").removeAttribute("hidden");
             document.getElementById(swapFrom).toggleAttribute("hidden");
             document.getElementById(swapTo).toggleAttribute("hidden");
             document.getElementById("addnew").toggleAttribute("hidden");
