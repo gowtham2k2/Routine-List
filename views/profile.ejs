@@ -1,8 +1,13 @@
 <%- include("partials/header.ejs") %>
     <div class="container profile">
-        <h2>Welcome <%= userName %>
+        <h2>
+            <%= user.firstName %>
+                <%= user.lastName %>
         </h2>
         <div class="list-container">
+            <h4>
+                <%= user.userName %>'s today schedule
+            </h4>
             <% locals.data.forEach((item)=>{ %>
                 <div class="list-item">
                     <form action="/delete" method="post">
@@ -23,14 +28,32 @@
                             src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
                 </div>
                 <% }); %>
+                    <form id="addnew" action="/add" method="post" hidden>
+                        <input type="text" name="newItem" autofocus="true" autocomplete="off">
+                        <input type="hidden" name="userId" value="<%= user.userId %>">
+                        <p>at</p>
+                        <input type="time" name="userTime">
+                        <button type="submit">add</button>
+                    </form>
+                    <div id="addnew-btn" class="btn circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')">+</div>
+                    <div id="cancelAdd-btn" class="btn circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')" hidden>✖</div>
         </div>
     </div>
     <script>
         function handler(id) {
-            document.getElementById("title" + id).setAttribute("hidden", true)
-            document.getElementById("edit" + id).setAttribute("hidden", true)
-            document.getElementById("done" + id).removeAttribute("hidden")
-            document.getElementById("input" + id).removeAttribute("hidden")
+            document.getElementById("title" + id).setAttribute("hidden", true);
+            document.getElementById("edit" + id).setAttribute("hidden", true);
+            document.getElementById("done" + id).removeAttribute("hidden");
+            document.getElementById("input" + id).removeAttribute("hidden");
+        }
+
+        function swapper(swapFrom, swapTo) {
+            // document.getElementById(swapFrom).setAttribute("hidden", true);
+            // document.getElementById(swapTo).removeAttribute("hidden");
+            // document.getElementById("addnew").removeAttribute("hidden");
+            document.getElementById(swapFrom).toggleAttribute("hidden");
+            document.getElementById(swapTo).toggleAttribute("hidden");
+            document.getElementById("addnew").toggleAttribute("hidden");
         }
     </script>
     <%- include("partials/footer.ejs") %>

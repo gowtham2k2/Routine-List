@@ -43,7 +43,7 @@ app.get("/profile", async (req, res) => {
     );
     console.log(result.rows);
     res.render("profile.ejs", {
-      userName: currentUser.userName,
+      user: currentUser,
       data: result.rows,
     });
   } catch (err) {
@@ -62,6 +62,16 @@ app.post("/edit", async (req, res) => {
       itemTitle,
       itemId,
     ]);
+    res.redirect("/profile");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/delete", async (req, res) => {
+  const itemId = req.body.deleteItemId;
+  try {
+    await db.query("DELETE FROM todo_list WHERE id = $1", [itemId]);
     res.redirect("/profile");
   } catch (err) {
     console.log(err);
