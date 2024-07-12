@@ -14,17 +14,80 @@ body {
 }
 
 header {
-    font-size: 1.2rem;
-    background-color: var(--comColr2);
+    font-size: 1rem;
     color: var(--comColr2);
+    margin-top: 20px;
     margin-bottom: 20px;
+    font-weight: 600;
 }
 
 header .webpage-title {
     text-decoration: none;
     color: #FFF;
+    font-weight: lighter;
+    font-size: 1.5rem;
 }
 
+header .login-bar{
+    display: flex;
+    flex-flow: row wrap;
+}
+
+#loginBtn{
+    background-color: var(--comColr);
+    color: #FFF;
+    padding: 4px 6px;
+    border: none;
+    cursor: pointer;
+}
+#signupBtn{
+    border: 1px solid var(--comColr2);
+    color: var(--comColr2);
+    background: transparent;
+    padding: 4px 6px;
+    cursor: pointer;
+}
+/* login form */
+#loginForm{
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, .5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loginForm>form{
+    display: flex;
+    width: 40%;
+    height: 50%;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 35px;
+    background-image: linear-gradient(to top right, var(--comColr2)35%, var(--comColr)65%);
+    position: relative;
+}
+#loginForm>form>*{
+    width: 70%;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #fff;
+    background: transparent;
+    color: #FFF;
+}
+#loginForm>form>button{
+    border: none;
+    background-image: linear-gradient(to bottom left, #f0ff6e, #ACD96C, #899973);
+    width: 20%;
+    text-align: center;
+    padding: 4px 0;
+}
+
+/* profile section */
 .profile h2 {
     font-size: 2.5rem;
     color: var(--comColr);
@@ -33,6 +96,12 @@ header .webpage-title {
     margin-bottom: 30px;
     padding-bottom: 10px;
     border-bottom: 5px solid var(--comColr);
+}
+
+.list-container>p {
+    color: var(--comColr2);
+    font-weight: 600;
+    font-size: 1.3rem;
 }
 
 .list-item {
@@ -51,20 +120,24 @@ header .webpage-title {
     height: 22px;
 }
 
-.list-container #addnew {
+.list-container #addnew,
+.list-item .edit-list {
     display: flex;
     flex-flow: row nowrap;
     align-items: baseline;
     gap: 10px;
     margin-bottom: 25px;
 }
-.list-container #addnew>*{
+
+.list-container #addnew>*,
+.list-item .edit-list>* {
     padding: 0;
     margin: 0;
     background: none;
     border: none;
-    border-bottom: 2px solid var(--comColr) ;
+    border-bottom: 2px solid var(--comColr);
     outline: none;
+    color: #FFF;
 }
 
 .list-container .btn {

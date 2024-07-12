@@ -4,41 +4,46 @@
             <%= user.firstName %>
                 <%= user.lastName %>
         </h2>
-        <div class="list-container">
-            <h4 class="mb-4">
+        <div class="list-container shadow p-3 mb-5 rounded">
+            <p class="mb-4">
                 <%= user.userName %>'s today schedule
-            </h4>
+            </p>
             <% locals.data.forEach((item)=>{ %>
                 <div class="list-item">
-                    <form action="/delete" method="post">
+                    <form class="delete-check-btn" action="/delete" method="post">
                         <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
                     </form>
 
                     <p id="title<%=item.id%>" class="m-0">
-                        <%= item.todo_title %>
+                        <%= item.todo_title %> at <%= item.time %>
                     </p>
 
-                    <form class="edit" action="/edit" method="post">
+                    <form class="edit-list" action="/edit" method="post">
                         <input type="hidden" name="updatedItemId" value="<%= item.id %>">
                         <input id="input<%=item.id%>" type="text" name="updatedItemTitle" value="<%= item.todo_title %>"
                             autocomplete="off" autofocus="true" hidden="true" />
+                        <p hidden="true">at</p>
+                        <input id="editTime<%= item.id %>" type="time" name="editTime" value="<%= item.time %>"
+                            hidden="true">
                         <button id="done<%=item.id%>" class="edit" type="submit" hidden>change</button>
                     </form>
-                    <button id="edit<%=item.id%>" class="edit" onclick="handler('<%=item.id%>')"><img class="icon"
+                    <button id="edit<%=item.id%>" class="edit-btn" onclick="handler('<%=item.id%>')"><img class="icon"
                             src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+                    <a id="cancelEdit-btn" href="/profile" hidden="true">cancel</a>
                 </div>
                 <% }); %>
-                    <form id="addnew" action="/add" method="post" hidden>
+                    <form class="mt-3" id="addnew" action="/add" method="post" hidden>
                         <input type="text" name="newItem" autofocus="on" autocomplete="off">
                         <input type="hidden" name="userId" value="<%= user.userId %>">
                         <p>at</p>
                         <input type="time" name="userTime">
-                        <button type="submit">add</button>
+                        <button class="add-btn rounded" type="submit">add</button>
                     </form>
-                    <div id="addnew-btn" class="btn rounded-circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')">+
+                    <div id="addnew-btn" class="btn rounded-circle mt-3"
+                        onclick="swapper('addnew-btn', 'cancelAdd-btn')">+
                     </div>
-                    <div id="cancelAdd-btn" class="btn rounded-circle" onclick="swapper('addnew-btn', 'cancelAdd-btn')"
-                        hidden>✖</div>
+                    <div id="cancelAdd-btn" class="btn rounded-circle mt-3"
+                        onclick="swapper('addnew-btn', 'cancelAdd-btn')" hidden>✖</div>
 
         </div>
     </div>
@@ -48,6 +53,11 @@
             document.getElementById("edit" + id).setAttribute("hidden", true);
             document.getElementById("done" + id).removeAttribute("hidden");
             document.getElementById("input" + id).removeAttribute("hidden");
+            document.getElementById("editTime" + id).removeAttribute("hidden");
+            document.querySelector(".edit-list>p").removeAttribute("hidden");
+            document.querySelector(".list-item>#cancelEdit-btn").removeAttribute("hidden");
+            ducument.querySelector(".list-item>.delete-check-btn").setAttribute("hidden", true);
+
         }
 
         function swapper(swapFrom, swapTo) {

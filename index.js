@@ -41,7 +41,6 @@ app.get("/profile", async (req, res) => {
       "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
       [currentUser.userId]
     );
-    console.log(result.rows);
     res.render("profile.ejs", {
       user: currentUser,
       data: result.rows,
@@ -54,14 +53,12 @@ app.get("/profile", async (req, res) => {
 app.post("/edit", async (req, res) => {
   const itemId = parseInt(req.body.updatedItemId);
   const itemTitle = req.body.updatedItemTitle;
-  console.log(
-    `${itemId} is ${typeof itemId} and ${itemTitle} is ${typeof itemTitle}`
-  );
+  const updatedTime = req.body.editTime;
   try {
-    await db.query("UPDATE todo_list SET todo_title = $1 WHERE id = $2;", [
-      itemTitle,
-      itemId,
-    ]);
+    await db.query(
+      "UPDATE todo_list SET todo_title = $1, time = $2 WHERE id = $3;",
+      [itemTitle, updatedTime, itemId]
+    );
     res.redirect("/profile");
   } catch (err) {
     console.log(err);
@@ -72,6 +69,24 @@ app.post("/delete", async (req, res) => {
   const itemId = req.body.deleteItemId;
   try {
     await db.query("DELETE FROM todo_list WHERE id = $1", [itemId]);
+    res.redirect("/profile");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/add", async (req, res) => {
+  const newList = {
+    itemTitle: req.body.newItem,
+    time: req.body.userTime,
+    userId: parseInt(req.body.userId),
+  };
+
+  try {
+    await db.query(
+      "INSERT INTO todo_list(todo_title, time, user_id) VALUES($1, $2, $3);",
+      [newList.itemTitle, newList.time, newList.userId]
+    );
     res.redirect("/profile");
   } catch (err) {
     console.log(err);

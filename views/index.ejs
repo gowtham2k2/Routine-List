@@ -1,8 +1,11 @@
 <%- include("./partials/header.ejs") %>
-<div class="container">
-    <div>
-        <p>gowtham2k2</p>
-
+    <div class="container">
+        <div id="loginForm" class="p-3 shadow" hidden>
+            <form class="d-flex flex-column" action="/login" method="post">
+                <input type="text" name="userNameOrEmail" placeholder="username or email" required autocomplete="off">
+                <input type="password" name="password" placeholder="password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
     </div>
-</div>
-<%- include("./partials/footer.ejs") %>
+    <%- include("./partials/footer.ejs") %>
