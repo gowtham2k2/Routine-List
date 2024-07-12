@@ -90,7 +90,8 @@ header .login-bar {
     text-align: center;
     padding: 4px 0;
 }
-#loginForm>form>input::placeholder{
+
+#loginForm>form>input::placeholder {
     color: #b4b4b4;
     font-style: italic;
 }
@@ -109,6 +110,15 @@ header .login-bar {
 
 #loginForm>form>#cancelLoginBtn:hover {
     color: rgb(72, 70, 70);
+}
+
+#loginForm>form>#loginAlert {
+    color: red;
+    font-size: 12px;
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* profile section */

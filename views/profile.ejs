@@ -1,12 +1,12 @@
 <%- include("partials/header.ejs") %>
     <div class="container profile">
         <h2>
-            <%= user.firstName %>
-                <%= user.lastName %>
+            <%= user.first_name %>
+                <%= user.last_name %>
         </h2>
         <div class="list-container shadow p-3 mb-5 rounded">
             <p class="mb-4">
-                <%= user.userName %>'s today schedule
+                <%= user.user_name %>'s today schedule
             </p>
             <% locals.data.forEach((item)=>{ %>
                 <div class="list-item">
@@ -34,7 +34,7 @@
                 <% }); %>
                     <form class="mt-3" id="addnew" action="/add" method="post" hidden>
                         <input type="text" name="newItem" autofocus="on" autocomplete="off">
-                        <input type="hidden" name="userId" value="<%= user.userId %>">
+                        <input type="hidden" name="user_id" value="<%= user.user_id %>">
                         <p>at</p>
                         <input type="time" name="userTime">
                         <button class="add-btn rounded" type="submit">add</button>

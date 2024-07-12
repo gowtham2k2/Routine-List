@@ -1,11 +1,13 @@
 <%- include("./partials/header.ejs") %>
     <div class="container">
-        <div id="loginForm" class="p-3 shadow" hidden>
+        <div id="loginForm" class="p-3 shadow" hidden="<%= loginHideFlag %>">
             <form class="d-flex flex-column" action="/login" method="post">
                 <p id="cancelLoginBtn">X</p>
-                <input type="text" name="userNameOrEmail" placeholder="username or email" spellcheck="false" required autocomplete="off">
+                <input type="text" name="userNameOrEmail" placeholder="username or email" spellcheck="false" required
+                    autocomplete="off">
                 <input type="password" name="password" placeholder="password" required>
                 <button type="submit">Login</button>
+                <p id="loginAlert">incorrect username or password</p>
             </form>
         </div>
     </div>

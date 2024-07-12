@@ -18,15 +18,47 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let currentUser = {
-  userId: 1,
-  userName: "gowtham2k2",
-  firstName: "Gowtham",
-  lastName: "G",
-};
+let currentUser;
+
+let loginFlag = false;
 
 app.get("/", (req, res) => {
-  res.render("index.ejs");
+  res.render("index.ejs", {
+    loginHideFlag: "true",
+  });
+});
+
+app.post("/login", async (req, res) => {
+  const userNameOrEmail = req.body.userNameOrEmail;
+  const password = req.body.password;
+
+  try {
+    const result = await db.query(
+      "SELECT id, user_name, first_name, last_name FROM users WHERE (user_name = $1 OR email = $1) AND password = $2",
+      [userNameOrEmail, password]
+    );
+    console.log(result.rows[0]);
+    currentUser = {
+      id: result.rows[0].id,
+      user_name: result.rows[0].user_name,
+      first_name: result.rows[0].first_name,
+      last_name: result.rows[0].last_name,
+    };
+
+    loginFlag = true;
+
+    res.redirect("/profile");
+  } catch (err) {
+    console.log(err);
+    res.render("index.ejs", {
+      loginHideFlag: "false",
+    });
+  }
+});
+
+app.get("/logout", (req, res) => {
+  currentUser = null;
+  res.redirect("/");
 });
 
 app.post("/submit", (req, res) => {
@@ -39,7 +71,7 @@ app.get("/profile", async (req, res) => {
   try {
     const result = await db.query(
       "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
-      [currentUser.userId]
+      [currentUser.user_id]
     );
     res.render("profile.ejs", {
       user: currentUser,

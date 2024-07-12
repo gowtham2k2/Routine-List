@@ -13,10 +13,24 @@
 <body>
     <header class=" container-fluid">
         <nav class="navbar">
-                <a class="webpage-title" href="/">Todo tracker ✔</a>
-                <div class="login-bar">
-                    <div id="loginBtn" class="me-3 rounded">login</div>
-                    <div id="signupBtn" class="rounded">SignUp</div>
+            <a class="webpage-title" href="/">Todo tracker ✔</a>
+            <div class="login-bar">
+                <div id="loginBtn" class="me-3 rounded">login</div>
+                <div id="signupBtn" class="rounded">SignUp</div>
+            </div>
+            <% if(locals.user) {%>
+                <div id=<%=user.user_name %> class="user-menu">
+                    <button type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <%= user.user_name %>
+                    </button>
+                    <ul class="dropdown-menu" style="">
+                        <li>
+                            <form class="logout-form" action="/logout" method="get">
+                                <button type="submit">logout</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
+                <% } %>
         </nav>
     </header>
