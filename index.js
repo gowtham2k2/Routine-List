@@ -71,7 +71,7 @@ app.get("/profile", async (req, res) => {
   try {
     const result = await db.query(
       "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
-      [currentUser.user_id]
+      [currentUser.id]
     );
     res.render("profile.ejs", {
       user: currentUser,
@@ -111,8 +111,10 @@ app.post("/add", async (req, res) => {
   const newList = {
     itemTitle: req.body.newItem,
     time: req.body.userTime,
-    userId: parseInt(req.body.userId),
+    userId: parseInt(req.body.user_id),
   };
+
+  console.log(newList);
 
   try {
     await db.query(
