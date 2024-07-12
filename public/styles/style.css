@@ -28,27 +28,29 @@ header .webpage-title {
     font-size: 1.5rem;
 }
 
-header .login-bar{
+header .login-bar {
     display: flex;
     flex-flow: row wrap;
 }
 
-#loginBtn{
+#loginBtn {
     background-color: var(--comColr);
     color: #FFF;
     padding: 4px 6px;
     border: none;
     cursor: pointer;
 }
-#signupBtn{
+
+#signupBtn {
     border: 1px solid var(--comColr2);
     color: var(--comColr2);
     background: transparent;
     padding: 4px 6px;
     cursor: pointer;
 }
+
 /* login form */
-#loginForm{
+#loginForm {
     height: 100vh;
     width: 100vw;
     position: fixed;
@@ -60,7 +62,7 @@ header .login-bar{
     align-items: center;
 }
 
-#loginForm>form{
+#loginForm>form {
     display: flex;
     width: 40%;
     height: 50%;
@@ -71,7 +73,8 @@ header .login-bar{
     background-image: linear-gradient(to top right, var(--comColr2)35%, var(--comColr)65%);
     position: relative;
 }
-#loginForm>form>*{
+
+#loginForm>form>* {
     width: 70%;
     outline: none;
     border: none;
@@ -79,12 +82,33 @@ header .login-bar{
     background: transparent;
     color: #FFF;
 }
-#loginForm>form>button{
+
+#loginForm>form>button {
     border: none;
     background-image: linear-gradient(to bottom left, #f0ff6e, #ACD96C, #899973);
     width: 20%;
     text-align: center;
     padding: 4px 0;
+}
+#loginForm>form>input::placeholder{
+    color: #b4b4b4;
+    font-style: italic;
+}
+
+#loginForm>form>#cancelLoginBtn {
+    position: absolute;
+    width: max-content;
+    right: 2%;
+    top: 2%;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+#loginForm>form>#cancelLoginBtn:hover {
+    color: rgb(72, 70, 70);
 }
 
 /* profile section */
