@@ -8,7 +8,7 @@
             <p class="mb-4">
                 <%= user.user_name %>'s today schedule
             </p>
-            <% locals.data.forEach((item)=>{ %>
+            <%if(locals.data){ data.forEach((item)=>{ %>
                 <div class="list-item">
                     <form class="delete-check-btn" action="/delete" method="post">
                         <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
@@ -31,7 +31,7 @@
                             src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
                     <a id="cancelEdit-btn" href="/profile" hidden="true">cancel</a>
                 </div>
-                <% }); %>
+                <% });} %>
                     <form class="mt-3" id="addnew" action="/add" method="post" hidden>
                         <input type="text" name="newItem" autofocus="on" autocomplete="off" required>
                         <input type="hidden" name="user_id" value="<%= user.id %>">
@@ -65,5 +65,8 @@
             document.getElementById(swapTo).toggleAttribute("hidden");
             document.getElementById("addnew").toggleAttribute("hidden");
         }
+        <% if (locals.loginFlag === true) {%>
+            document.querySelector("header .login-bar").setAttribute("hidden", true); 
+        <% } %>
     </script>
     <%- include("partials/footer.ejs") %>

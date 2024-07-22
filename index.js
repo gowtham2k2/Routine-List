@@ -21,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 let currentUser;
-
 let loginFlag = false;
 
 app.get("/", (req, res) => {
@@ -78,10 +77,10 @@ app.post("/register", async (req, res) => {
                 ]
               );
               currentUser = result.rows[0];
-              console.log(currentUser);
+              loginFlag = true;
+              res.redirect("/profile");
             }
           );
-          res.redirect("/profile");
         }
         // if both entered and re-entered password doesn't match
         else {
@@ -111,20 +110,37 @@ app.post("/login", async (req, res) => {
   const password = req.body.password;
 
   try {
-    const result = await db.query(
-      "SELECT id, user_name, first_name, last_name FROM users WHERE (user_name = $1 OR email = $1) AND password = $2",
-      [userNameOrEmail, password]
+    const isUserExists = await db.query(
+      "SELECT EXISTS(SELECT 1 FROM users WHERE (user_name = $1 OR email = $1));",
+      [userNameOrEmail]
     );
-    currentUser = {
-      id: result.rows[0].id,
-      user_name: result.rows[0].user_name,
-      first_name: result.rows[0].first_name,
-      last_name: result.rows[0].last_name,
-    };
-
-    loginFlag = true;
-
-    res.redirect("/profile");
+    if (isUserExists.rows[0].exists) {
+      const result = await db.query(
+        "SELECT id, first_name, last_name, user_name, password FROM users WHERE (user_name = $1 OR email = $1);",
+        [userNameOrEmail]
+      );
+      const user = result.rows[0];
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) console.log(err);
+        else {
+          if (result) {
+            currentUser = user;
+            loginFlag = true;
+            res.redirect("/profile");
+          } else {
+            res.render("index.ejs", {
+              loginError: true,
+              loginAlert: "Incorrect password.",
+            });
+          }
+        }
+      });
+    } else {
+      res.render("index.ejs", {
+        loginError: true,
+        loginAlert: "User not found.",
+      });
+    }
   } catch (err) {
     console.log(err);
   }
@@ -135,21 +151,27 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-app.post("/submit", (req, res) => {
-  const time = req.body.userTime;
-  res.redirect("/");
-});
-
 app.get("/profile", async (req, res) => {
   try {
-    const result = await db.query(
-      "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
+    const isListExits = await db.query(
+      "SELECT EXISTS(SELECT 1 FROM todo_list WHERE user_id = $1);",
       [currentUser.id]
     );
-    res.render("profile.ejs", {
-      user: currentUser,
-      data: result.rows,
-    });
+
+    if (isListExits.rows[0].exists) {
+      const result = await db.query(
+        "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
+        [currentUser.id]
+      );
+
+      res.render("profile.ejs", {
+        user: currentUser,
+        data: result.rows,
+        loginFlag: loginFlag,
+      });
+    } else {
+      res.render("profile.ejs", { user: currentUser, loginFlag: loginFlag });
+    }
   } catch (err) {
     console.log(err);
   }
