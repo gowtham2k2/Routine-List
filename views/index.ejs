@@ -1,14 +1,44 @@
 <%- include("./partials/header.ejs") %>
     <div class="container">
-        <div id="loginForm" class="p-3 shadow" hidden="<%= loginHideFlag %>">
+        <div id="loginForm" class="p-3 shadow form-container" hidden>
             <form class="d-flex flex-column" action="/login" method="post">
-                <p id="cancelLoginBtn">X</p>
+                <p id="cancelLoginBtn" class="cancel-form-btn">X</p>
                 <input type="text" name="userNameOrEmail" placeholder="username or email" spellcheck="false" required
                     autocomplete="off">
                 <input type="password" name="password" placeholder="password" required>
                 <button type="submit">Login</button>
-                <p id="loginAlert">incorrect username or password</p>
+                <p id="loginAlert" class="credential-alert">incorrect username or password</p>
+            </form>
+        </div>
+
+        <div id="signUpForm" class="p-3 shadow form-container" hidden>
+            <form action="/register" method="post">
+                <p id="cancelSignUpBtn" class="cancel-form-btn">❌</p>
+                <input type="text" name="firstName" value="<%= locals.signUpData? signUpData.firstName: '' %>"
+                    placeholder="First name" autocomplete="off" required>
+                <input type="text" name="lastName" value="<%= locals.signUpData? signUpData.lastName: '' %>"
+                    placeholder="Last Name" autocomplete="off">
+                <input type="text" name="userName" value="<%= locals.signUpData? signUpData.userName: '' %>"
+                    placeholder="user_name eg: drake69" autocomplete="off" required>
+                <input type="email" name="email" value="<%= locals.signUpData? signUpData.email: '' %>"
+                    placeholder="Email" autocomplete="off" spellcheck="false" required>
+                <input type="password" name="enteredPassword"
+                    value="<%= locals.signUpData? signUpData.enteredPassword: '' %>" placeholder="Enter Password"
+                    autocomplete="off" required>
+                <input type="password" name="reEnteredPassword"
+                    value="<%= locals.signUpData? signUpData.reEnteredPassword: '' %>" placeholder="Re-enter password"
+                    autocomplete="off" required>
+                <button type="submit">Register</button>
+                <p id="signUpAlert" class="credential-alert" hidden>
+                    <%= locals.registerAlert? registerAlert: "" %>
+                </p>
             </form>
         </div>
     </div>
+    <script><% if (locals.signUpError) { %>
+            document.getElementById("signUpForm").removeAttribute("hidden");
+            document.getElementById("signUpAlert").removeAttribute("hidden");
+        <% } %>
+    </script>
+
     <%- include("./partials/footer.ejs") %>

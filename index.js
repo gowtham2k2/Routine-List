@@ -1,9 +1,11 @@
 import pg from "pg";
 import bodyParser from "body-parser";
 import express from "express";
+import bcrypt, { hash } from "bcrypt";
 
 const app = express();
 const port = 3000;
+const saltRounds = 10;
 
 const db = new pg.Client({
   user: "postgres",
@@ -23,9 +25,85 @@ let currentUser;
 let loginFlag = false;
 
 app.get("/", (req, res) => {
-  res.render("index.ejs", {
-    loginHideFlag: "true",
-  });
+  res.render("index.ejs");
+});
+
+app.post("/register", async (req, res) => {
+  const newUser = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    userName: req.body.userName,
+    email: req.body.email,
+    enteredPassword: req.body.enteredPassword,
+    reEnteredPassword: req.body.reEnteredPassword,
+  };
+
+  try {
+    const isEmailExists = await db.query(
+      "SELECT EXISTS( SELECT 1 FROM users WHERE email = $1)",
+      [newUser.email]
+    );
+    // if email is not duplicate
+    if (!isEmailExists.rows[0].exists) {
+      const isUserNameExists = await db.query(
+        "SELECT EXISTS( SELECT 1 FROM users WHERE user_name = $1)",
+        [newUser.userName]
+      );
+      // if username already exist
+      if (isUserNameExists.rows[0].exists) {
+        res.render("index.ejs", {
+          signUpError: true,
+          registerAlert: "This User Name already Exists.",
+          signUpData: newUser,
+        });
+      }
+      // if username is suitable for new entry
+      else {
+        // if both entered and re-entered password are correct
+        if (newUser.enteredPassword === newUser.reEnteredPassword) {
+          bcrypt.hash(
+            newUser.reEnteredPassword,
+            saltRounds,
+            async (err, hash) => {
+              if (err) console.log(err);
+              console.log(hash);
+              const result = await db.query(
+                "INSERT INTO users(first_name, last_name, user_name, email, password) VALUES($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, user_name;",
+                [
+                  newUser.firstName,
+                  newUser.lastName,
+                  newUser.userName,
+                  newUser.email,
+                  hash,
+                ]
+              );
+              currentUser = result.rows[0];
+              console.log(currentUser);
+            }
+          );
+          res.redirect("/profile");
+        }
+        // if both entered and re-entered password doesn't match
+        else {
+          res.render("index.ejs", {
+            signUpError: true,
+            registerAlert: "Re enter ther correct password.",
+            signUpData: newUser,
+          });
+        }
+      }
+    }
+    // if email is duplicate or already exist
+    else {
+      res.render("index.ejs", {
+        signUpError: true,
+        registerAlert: "Email already Exists.",
+        signUpData: newUser,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.post("/login", async (req, res) => {
@@ -37,7 +115,6 @@ app.post("/login", async (req, res) => {
       "SELECT id, user_name, first_name, last_name FROM users WHERE (user_name = $1 OR email = $1) AND password = $2",
       [userNameOrEmail, password]
     );
-    console.log(result.rows[0]);
     currentUser = {
       id: result.rows[0].id,
       user_name: result.rows[0].user_name,
@@ -50,9 +127,6 @@ app.post("/login", async (req, res) => {
     res.redirect("/profile");
   } catch (err) {
     console.log(err);
-    res.render("index.ejs", {
-      loginHideFlag: "false",
-    });
   }
 });
 
@@ -63,7 +137,6 @@ app.get("/logout", (req, res) => {
 
 app.post("/submit", (req, res) => {
   const time = req.body.userTime;
-  console.log(time + "\n" + typeof time);
   res.redirect("/");
 });
 
@@ -113,8 +186,6 @@ app.post("/add", async (req, res) => {
     time: req.body.userTime,
     userId: parseInt(req.body.user_id),
   };
-
-  console.log(newList);
 
   try {
     await db.query(
