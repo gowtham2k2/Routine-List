@@ -10,34 +10,38 @@
             </p>
             <%if(locals.data){ data.forEach((item)=>{ %>
                 <div class="list-item">
-                    <form class="delete-check-btn" action="/delete" method="post">
-                        <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
-                    </form>
 
-                    <p id="title<%=item.id%>" class="m-0">
-                        <%= item.todo_title %> at <%= item.time %>
-                    </p>
+                    <div id="existingItem<%= item.id %>" class="existing-item">
+                        <form id="deleteItem<%= item.id %>" class="delete-check-btn me-2" action="/delete"
+                            method="post">
+                            <input type="checkbox" onchange="this.form.submit()" name="deleteItemId"
+                                value="<%= item.id %>">
+                        </form>
+                        <p id="title<%=item.id%>" class="m-0">
+                            <%= item.todo_title %> at <%= item.time %>
+                        </p>
+                        <button id="editBtn<%=item.id%>" class="edit-btn" onclick="handler('<%=item.id%>')"><img
+                                class="icon" src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+                    </div>
 
-                    <form class="edit-list" action="/edit" method="post">
+                    <form id="editItemForm<%= item.id %>" class="edit-list-item" action="/edit" method="post" hidden>
                         <input type="hidden" name="updatedItemId" value="<%= item.id %>">
                         <input id="input<%=item.id%>" type="text" name="updatedItemTitle" value="<%= item.todo_title %>"
-                            autocomplete="off" autofocus="true" hidden="true" />
-                        <p hidden="true">at</p>
-                        <input id="editTime<%= item.id %>" type="time" name="editTime" value="<%= item.time %>"
-                            hidden="true">
-                        <button id="done<%=item.id%>" class="edit" type="submit" hidden>change</button>
+                            autocomplete="off" autofocus="true" />
+                        <p>at</p>
+                        <input id="editTime<%= item.id %>" type="time" name="editTime" value="<%= item.time %>">
+                        <button id="done<%=item.id%>" class="edit" type="submit">change</button>
+                        <button id="cancelEditBtn<%= item.id %>" type="button"
+                            onclick="cancelEdit('<%= item.id %>')">cancel</button>
                     </form>
-                    <button id="edit<%=item.id%>" class="edit-btn" onclick="handler('<%=item.id%>')"><img class="icon"
-                            src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
-                    <a id="cancelEdit-btn" href="/profile" hidden="true">cancel</a>
                 </div>
                 <% });} %>
                     <form class="mt-3" id="addnew" action="/add" method="post" hidden>
                         <input type="text" name="newItem" autofocus="on" autocomplete="off" required>
                         <input type="hidden" name="user_id" value="<%= user.id %>">
                         <p>at</p>
-                        <input type="time" name="userTime">
-                        <button class="add-btn rounded" type="submit">add</button>
+                        <input type="time" name="userTime" required>
+                        <button type="submit">add</button>
                     </form>
                     <div id="addnew-btn" class="btn rounded-circle mt-3"
                         onclick="swapper('addnew-btn', 'cancelAdd-btn')">+
@@ -49,15 +53,15 @@
     </div>
     <script>
         function handler(id) {
-            document.getElementById("title" + id).setAttribute("hidden", true);
-            document.getElementById("edit" + id).setAttribute("hidden", true);
-            document.getElementById("done" + id).removeAttribute("hidden");
-            document.getElementById("input" + id).removeAttribute("hidden");
-            document.getElementById("editTime" + id).removeAttribute("hidden");
-            document.querySelector(".edit-list>p").removeAttribute("hidden");
-            document.querySelector(".list-item>#cancelEdit-btn").removeAttribute("hidden");
-            ducument.querySelector(".list-item>.delete-check-btn").setAttribute("hidden", true);
+            document.getElementById("editItemForm" + id).removeAttribute("hidden");
+            document.getElementById("existingItem" + id).setAttribute("hidden", true);
+            document.getElementById("editBtn" + id).setAttribute("hidden", true);
+        }
 
+        function cancelEdit(id) {
+            document.getElementById("editItemForm" + id).setAttribute("hidden", true);
+            document.getElementById("existingItem" + id).removeAttribute("hidden");
+            document.getElementById("editBtn" + id).removeAttribute("hidden");
         }
 
         function swapper(swapFrom, swapTo) {

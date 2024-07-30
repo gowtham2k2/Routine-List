@@ -3,13 +3,14 @@
         <div id="loginForm" class="p-3 shadow form-container" hidden>
             <form class="d-flex flex-column" action="/login" method="post">
                 <p id="cancelLoginBtn" class="cancel-form-btn">X</p>
-                <input type="text" name="userNameOrEmail" placeholder="username or email" spellcheck="false" required
-                    autocomplete="off">
-                <input type="password" name="password" placeholder="password" required>
+                <input type="text" name="username" placeholder="username or email" spellcheck="false" required
+                    autocomplete="off" autofocus="on">
+                <input type="password" name="password" placeholder="password" autofocus="off" required>
                 <button type="submit">Login</button>
                 <p id="loginAlert" class="credential-alert" hidden>
                     <%= locals.loginAlert? loginAlert: "" %>
                 </p>
+                <button id="signUpRouteBtn" class="route-btn" type="button">New user ?</button>
             </form>
         </div>
 
@@ -34,6 +35,7 @@
                 <p id="signUpAlert" class="credential-alert" hidden>
                     <%= locals.registerAlert? registerAlert: "" %>
                 </p>
+                <button id="loginRouteBtn" class="route-btn" type="button">Already have an Account?</button>
             </form>
         </div>
     </div>

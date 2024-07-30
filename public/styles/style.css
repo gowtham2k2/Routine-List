@@ -157,6 +157,16 @@ header .login-bar {
     border: none;
 }
 
+.form-container .route-btn {
+    background: none;
+    color: #dcdcdc56;
+    font-style: italic;
+}
+
+.form-container .route-btn:hover {
+    color: #dcdcdc;
+}
+
 /* profile section */
 .profile h2 {
     font-size: 2.5rem;
@@ -175,11 +185,14 @@ header .login-bar {
 }
 
 .list-item {
-    display: flex;
-    flex-flow: row nowrap;
-    gap: 4px;
     font-size: 1.6rem;
+    margin-bottom: 12px;
 }
+
+.existing-item>* {
+    display: inline-block;
+}
+
 
 .list-item button {
     background: none;
@@ -191,16 +204,17 @@ header .login-bar {
 }
 
 .list-container #addnew,
-.list-item .edit-list {
+.list-item .edit-list-item {
     display: flex;
-    flex-flow: row nowrap;
-    align-items: baseline;
+    flex-flow: row wrap;
+    align-items: center;
     gap: 10px;
     margin-bottom: 25px;
 }
 
+
 .list-container #addnew>*,
-.list-item .edit-list>* {
+.list-item .edit-list-item>* {
     padding: 0;
     margin: 0;
     background: none;
@@ -208,6 +222,21 @@ header .login-bar {
     border-bottom: 2px solid var(--comColr);
     outline: none;
     color: #FFF;
+}
+
+.list-item .edit-list-item>button,
+.list-container #addnew>button {
+    text-decoration: none;
+    margin: 0;
+    padding: 5px 12px;
+    font-size: 12px;
+    background-color: var(--comColr2);
+}
+
+.list-item .edit-list-item>p,
+.list-container #addnew>p{
+    color: var(--comColr2);
+    border: none;
 }
 
 .list-container .btn {
@@ -224,5 +253,16 @@ header .login-bar {
 
 .list-container .btn:hover {
     background-color: #944ea6;
+
+}
+
+@media(max-width: 435px) {
+    html {
+        font-size: 10px;
+    }
+
+    .list-item {
+        margin-bottom: 25px;
+    }
 
 }

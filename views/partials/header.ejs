@@ -19,17 +19,17 @@
                 <div id="signUpBtn" class="rounded">Sign Up</div>
             </div>
             <% if(locals.user) {%>
-                <div id=<%=user.user_name %> class="user-menu">
-                    <button type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <%= user.user_name %>
                     </button>
-                    <ul class="dropdown-menu" style="">
-                        <li>
-                            <form class="logout-form" action="/logout" method="get">
-                                <button type="submit">logout</button>
-                            </form>
-                        </li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                        <button class="dropdown-item" type="button">
+                            logout
+                            <form action="/logout"><button type="submit">Logout</button></form>
+                        </button>
+                    </div>
                 </div>
                 <% } %>
         </nav>

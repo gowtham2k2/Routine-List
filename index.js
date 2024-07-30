@@ -1,26 +1,44 @@
 import pg from "pg";
 import bodyParser from "body-parser";
 import express from "express";
-import bcrypt, { hash } from "bcrypt";
+import bcrypt from "bcrypt";
+import env from "dotenv";
+import session from "express-session";
+import passport from "passport";
+import { Strategy } from "passport-local";
 
 const app = express();
 const port = 3000;
 const saltRounds = 10;
+env.config();
 
-const db = new pg.Client({
-  user: "postgres",
-  password: "gowtham2k2",
-  host: "localhost",
-  port: 5432,
-  database: "routine_list",
-});
-
-db.connect();
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 1000 * 60 * 60,
+    },
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let currentUser;
+app.use(passport.initialize());
+app.use(passport.session());
+
+const db = new pg.Client({
+  user: process.env.PG_USER,
+  password: process.env.PG_PWD,
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  database: process.env.PG_DATABASE,
+});
+
+db.connect();
+
 let loginFlag = false;
 
 app.get("/", (req, res) => {
@@ -65,9 +83,8 @@ app.post("/register", async (req, res) => {
             saltRounds,
             async (err, hash) => {
               if (err) console.log(err);
-              console.log(hash);
               const result = await db.query(
-                "INSERT INTO users(first_name, last_name, user_name, email, password) VALUES($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, user_name;",
+                "INSERT INTO users(first_name, last_name, user_name, email, password) VALUES($1, $2, $3, $4, $5) RETURNING id, first_name, last_name, user_name, password;",
                 [
                   newUser.firstName,
                   newUser.lastName,
@@ -76,9 +93,11 @@ app.post("/register", async (req, res) => {
                   hash,
                 ]
               );
-              currentUser = result.rows[0];
+              const user = result.rows[0];
               loginFlag = true;
-              res.redirect("/profile");
+              req.login(user, (err) => {
+                res.redirect("/profile");
+              });
             }
           );
         }
@@ -105,75 +124,59 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
-  const userNameOrEmail = req.body.userNameOrEmail;
-  const password = req.body.password;
+// app.post("/login", (req, res) => {
+//   passport.authenticate("local", (err, user) => {
+//     console.log(user);
+//     if (err) console.log(err);
+//     if (!user)
+//       return res.render("index.ejs", { loginError: true, loginAlert: err });
+//     else return res.redirect("/profile");
+//   })(req, res);
+// });
 
-  try {
-    const isUserExists = await db.query(
-      "SELECT EXISTS(SELECT 1 FROM users WHERE (user_name = $1 OR email = $1));",
-      [userNameOrEmail]
-    );
-    if (isUserExists.rows[0].exists) {
-      const result = await db.query(
-        "SELECT id, first_name, last_name, user_name, password FROM users WHERE (user_name = $1 OR email = $1);",
-        [userNameOrEmail]
-      );
-      const user = result.rows[0];
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (err) console.log(err);
-        else {
-          if (result) {
-            currentUser = user;
-            loginFlag = true;
-            res.redirect("/profile");
-          } else {
-            res.render("index.ejs", {
-              loginError: true,
-              loginAlert: "Incorrect password.",
-            });
-          }
-        }
-      });
-    } else {
-      res.render("index.ejs", {
-        loginError: true,
-        loginAlert: "User not found.",
-      });
-    }
-  } catch (err) {
-    console.log(err);
-  }
-});
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/profile",
+    failureRedirect: "/",
+  })
+);
 
 app.get("/logout", (req, res) => {
-  currentUser = null;
   res.redirect("/");
 });
 
-app.get("/profile", async (req, res) => {
-  try {
-    const isListExits = await db.query(
-      "SELECT EXISTS(SELECT 1 FROM todo_list WHERE user_id = $1);",
-      [currentUser.id]
-    );
+/////////////////////////////////--------- profile page section---------/////////////////////////////
 
-    if (isListExits.rows[0].exists) {
-      const result = await db.query(
-        "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
-        [currentUser.id]
+app.get("/profile", async (req, res) => {
+  if (req.isAuthenticated()) {
+    try {
+      const isListExits = await db.query(
+        "SELECT EXISTS(SELECT 1 FROM todo_list WHERE user_id = $1);",
+        [req.user.id]
       );
 
-      res.render("profile.ejs", {
-        user: currentUser,
-        data: result.rows,
-        loginFlag: loginFlag,
-      });
-    } else {
-      res.render("profile.ejs", { user: currentUser, loginFlag: loginFlag });
+      if (isListExits.rows[0].exists) {
+        const result = await db.query(
+          "SELECT id, todo_title, time FROM todo_list WHERE user_id = $1 ORDER BY time ASC ;",
+          [req.user.id]
+        );
+
+        res.render("profile.ejs", {
+          user: req.user,
+          data: result.rows,
+          loginFlag: loginFlag,
+        });
+      } else {
+        res.render("profile.ejs", { user: req.user, loginFlag: loginFlag });
+      }
+    } catch (err) {
+      console.log(err);
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    res.render("index.ejs", {
+      loginError: true,
+    });
   }
 });
 
@@ -218,6 +221,51 @@ app.post("/add", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+// ----------------------------------------- end of profile section ------------------------- //
+
+passport.use(
+  new Strategy(async function verify(username, password, cb) {
+    try {
+      const isUserExists = await db.query(
+        "SELECT EXISTS(SELECT 1 FROM users WHERE (user_name = $1 OR email = $1));",
+        [username]
+      );
+      if (isUserExists.rows[0].exists) {
+        const result = await db.query(
+          "SELECT id, first_name, last_name, user_name, password FROM users WHERE (user_name = $1 OR email = $1);",
+          [username]
+        );
+        const user = result.rows[0];
+        bcrypt.compare(password, user.password, (err, result) => {
+          if (err) {
+            console.error("Error comparing passwords:", err);
+            return cb(err);
+          } else {
+            if (result) {
+              loginFlag = true;
+              console.log("success!!");
+              return cb(null, user);
+            } else {
+              return cb("Incorrect password", false);
+            }
+          }
+        });
+      } else {
+        return cb("User not found", false);
+      }
+    } catch (err) {
+      return cb(err);
+    }
+  })
+);
+
+passport.serializeUser((user, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser((user, cb) => {
+  cb(null, user);
 });
 
 app.listen(port, () => {
